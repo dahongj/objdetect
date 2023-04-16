@@ -8,7 +8,6 @@ def ballBox(bboxs, bboxIdx, classLabelIDs, classesList):
     for i in range(0, len(bboxIdx)):
         #Determine the bbox
         classLabelID = np.squeeze(classLabelIDs[np.squeeze(bboxIdx[i])])
-        print(classLabelID)
         classLabel = classesList[classLabelID]
         bbox = bboxs[np.squeeze(bboxIdx[i])]
         if classLabelID == 37:
@@ -81,22 +80,22 @@ class Detector:
             #Determine the existence of bounding boxes
             if len(bboxIdx) != 0:
   
-                    bbox = ballBox(bboxs, bboxIdx, classLabelIDs, self.classesList)
-                    displayText = "{}".format("sports ball", thickness = 1)
-                    #If there exists a sports ball bbox apply the filter prediction
-                    if(bbox):
-                        for i in bbox:
-                            x,y,a,b = i
-                            cx,cy = int((2*x + a) / 2), int((2*y + b) / 2)
-                            predicted = kf.visible_predict(cx, cy)
+                bbox = ballBox(bboxs, bboxIdx, classLabelIDs, self.classesList)
+                displayText = "{}".format("sports ball", thickness = 1)
+                #If there exists a sports ball bbox apply the filter prediction
+                if(bbox):
+                    for i in bbox:
+                        x,y,a,b = i
+                        cx,cy = int((2*x + a) / 2), int((2*y + b) / 2)
+                        predicted = kf.visible_predict(cx, cy)
                 
-                            cv2.rectangle(image, (x,y), (x+a,y+b), (255,255,0), thickness=2)
-                            cv2.putText(image, displayText, (x, y-10), cv2.FONT_HERSHEY_PLAIN, 1, (255,255,0), 2)
-                            cv2.circle(image, (predicted[0], predicted[1]), 5, (0, 0, 0), 4)
-                    else:
-                        #Apply the occlusion filter prediction
-                        predicted = kf.hidden_predict()
-                        cv2.circle(image, (predicted[0], predicted[1]), 5, (255, 0, 0), 4)
+                        cv2.rectangle(image, (x,y), (x+a,y+b), (255,255,0), thickness=2)
+                        cv2.putText(image, displayText, (x, y-10), cv2.FONT_HERSHEY_PLAIN, 1, (255,255,0), 2)
+                        cv2.circle(image, (predicted[0], predicted[1]), 5, (0, 0, 0), 4)
+                else:
+                    #Apply the occlusion filter prediction
+                    predicted = kf.hidden_predict()
+                    cv2.circle(image, (predicted[0], predicted[1]), 5, (255, 0, 0), 4)
 
             #Write the bounding box onto the video
             res.write(image)
